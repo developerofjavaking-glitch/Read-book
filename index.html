@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>আমৃত্যু ভালোবাসি অরিন | অনলাইন রিডার</title>
+<meta name="description" content="বইটি সরাসরি ওয়েবসাইট থেকেই পড়ুন, ডাউনলোড করারও প্রয়োজন নেই।">
+
+<!-- ===================== CONFIG =====================
+     বইয়ের নাম বা PDF ফাইলের নাম পরিবর্তন করতে চাইলে নিচের
+     দুটো লাইন এডিট করুন।
+===================================================== -->
+<script>
+  const BOOK_TITLE = "আমৃত্যু ভালোবাসি অরিন";
+  const PDF_FILE   = "book.pdf"; // এই ফাইলটা website এর root এ থাকতে হবে
+</script>
+
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<style>
+  :root{
+    --bg:#0f1115;
+    --panel:#171a21;
+    --panel-2:#1f232c;
+    --border:#2a2f3a;
+    --text:#eef0f3;
+    --muted:#9aa3b2;
+    --accent:#e63950;
+    --accent-2:#ff5f75;
+    --accent-soft:rgba(230,57,80,.14);
+    --radius:14px;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  [data-theme="light"]{
+    --bg:#f4f2ef;
+    --panel:#ffffff;
+    --panel-2:#f0eeeb;
+    --border:#e3e0da;
+    --text:#1c1c1e;
+    --muted:#6c6f76;
+    --accent:#c8283f;
+    --accent-2:#e63950;
+    --accent-soft:rgba(200,40,63,.10);
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:"Hind Siliguri","SolaimanLipi","Noto Sans Bengali",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    transition:background .3s ease,color .3s ease;
+  }
+
+  /* ---------- Top bar ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:12px 18px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    z-index:30;
+    flex-wrap:wrap;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  .brand .logo{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 4px 14px var(--accent-soft);
+  }
+  .brand .logo svg{width:18px;height:18px;fill:#fff;}
+  .brand h1{
+    font-size:16px;
+    margin:0;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:220px;
+  }
+  .brand .sub{font-size:11px;color:var(--muted);}
+
+  .spacer{flex:1;}
+
+  .toolbar{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:4px;
+  }
+  .btn{
+    border:none;
+    background:transparent;
+    color:var(--text);
+    width:34px;height:34px;
+    border-radius:9px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn:hover{background:var(--accent-soft);}
+  .btn:active{transform:scale(.92);}
+  .btn svg{width:17px;height:17px;fill:var(--text);}
+  .btn:disabled{opacity:.3;cursor:not-allowed;}
+  .btn:disabled:hover{background:transparent;}
+
+  .page-indicator{
+    font-size:13px;
+    color:var(--text);
+    display:flex;align-items:center;gap:6px;
+    padding:0 6px;
+    white-space:nowrap;
+  }
+  .page-indicator input{
+    width:44px;
+    text-align:center;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:7px;
+    padding:5px 3px;
+    font-size:13px;
+    font-family:inherit;
+  }
+
+  .btn-primary{
+    display:flex;align-items:center;gap:7px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    border-radius:10px;
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    box-shadow:0 6px 16px var(--accent-soft);
+    transition:transform .12s ease, box-shadow .12s ease;
+    white-space:nowrap;
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px var(--accent-soft);}
+  .btn-primary svg{width:15px;height:15px;fill:#fff;}
+
+  /* ---------- Progress bar ---------- */
+  .progress-track{
+    position:relative;
+    height:3px;
+    background:var(--border);
+    flex-shrink:0;
+  }
+  .progress-fill{
+    position:absolute;left:0;top:0;bottom:0;
+    width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .15s ease;
+  }
+
+  /* ---------- Viewer area ---------- */
+  main{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 12px 90px;
+    scroll-behavior:smooth;
+    position:relative;
+  }
+  .page-wrap{
+    position:relative;
+    margin-bottom:18px;
+    box-shadow:var(--shadow);
+    border-radius:4px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .page-wrap canvas{display:block;max-width:100%;height:auto;}
+  .page-num-tag{
+    position:absolute;
+    bottom:8px;right:10px;
+    background:rgba(0,0,0,.55);
+    color:#fff;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:20px;
+    pointer-events:none;
+  }
+
+  #loading{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    margin-top:80px;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .spinner{
+    width:36px;height:36px;
+    border-radius:50%;
+    border:3px solid var(--border);
+    border-top-color:var(--accent);
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- Floating action buttons (mobile) ---------- */
+  .fab-nav{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    align-items:center;
+    gap:4px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:30px;
+    padding:6px;
+    box-shadow:var(--shadow);
+    z-index:25;
+  }
+
+  /* ---------- Sidebar (bookmarks / thumbnails / search) ---------- */
+  .sidebar{
+    position:fixed;
+    top:0;right:0;
+    height:100%;
+    width:300px;
+    max-width:82vw;
+    background:var(--panel);
+    border-left:1px solid var(--border);
+    z-index:50;
+    transform:translateX(100%);
+    transition:transform .25s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px;border-bottom:1px solid var(--border);
+  }
+  .sidebar-header h3{margin:0;font-size:15px;}
+  .sidebar-tabs{display:flex;border-bottom:1px solid var(--border);}
+  .sidebar-tab{
+    flex:1;text-align:center;padding:10px;font-size:12.5px;
+    cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;
+  }
+  .sidebar-tab.active{color:var(--accent);border-color:var(--accent);font-weight:700;}
+  .sidebar-body{flex:1;overflow-y:auto;padding:12px;}
+
+  .search-box{
+    display:flex;gap:6px;padding:12px;border-bottom:1px solid var(--border);
+  }
+  .search-box input{
+    flex:1;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:13px;
+    font-family:inherit;
+  }
+  .search-result-item{
+    padding:10px;border-radius:8px;font-size:13px;cursor:pointer;
+    margin-bottom:6px;background:var(--panel-2);
+    line-height:1.5;
+  }
+  .search-result-item:hover{background:var(--accent-soft);}
+  .search-result-item b{color:var(--accent);}
+  .search-meta{font-size:11.5px;color:var(--muted);margin-bottom:8px;}
+
+  .bookmark-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px;border-radius:8px;background:var(--panel-2);
+    margin-bottom:6px;font-size:13px;cursor:pointer;
+  }
+  .bookmark-item:hover{background:var(--accent-soft);}
+  .bookmark-item .del{color:var(--muted);cursor:pointer;font-size:15px;}
+  .bookmark-empty{color:var(--muted);font-size:13px;text-align:center;margin-top:30px;}
+
+  .thumb-item{
+    margin-bottom:10px;cursor:pointer;border-radius:8px;overflow:hidden;
+    border:2px solid transparent;position:relative;
+  }
+  .thumb-item.active{border-color:var(--accent);}
+  .thumb-item canvas{display:block;width:100%;}
+  .thumb-item span{
+    position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.6);
+    color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;
+  }
+
+  .overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.4);
+    z-index:40;opacity:0;pointer-events:none;transition:opacity .25s ease;
+  }
+  .overlay.show{opacity:1;pointer-events:auto;}
+
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  @media (max-width:560px){
+    .brand h1{max-width:130px;font-size:14px;}
+    .toolbar .page-indicator{display:none;}
+    header{gap:8px;padding:10px 12px;}
+    .btn-primary span{display:none;}
+    .btn-primary{padding:9px 12px;}
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+<header>
+  <div class="brand">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2 2 7v10l10 5 10-5V7L12 2zm0 2.2 7.5 3.75L12 11.7 4.5 7.95 12 4.2zM4 9.3l7 3.5v7.6l-7-3.5V9.3zm9 11.1v-7.6l7-3.5v7.6l-7 3.5z"/></svg>
+    </div>
+    <div style="min-width:0;">
+      <h1 id="bookTitleEl">বই</h1>
+      <div class="sub" id="pageSub">লোড হচ্ছে…</div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="toolbar" title="জুম">
+    <button class="btn" id="zoomOut" aria-label="Zoom out">
+      <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+    </button>
+    <span id="zoomLevel" style="font-size:12.5px;color:var(--muted);min-width:40px;text-align:center;">100%</span>
+    <button class="btn" id="zoomIn" aria-label="Zoom in">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="prevPage" aria-label="Previous page">
+      <svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+    </button>
+    <div class="page-indicator">
+      <input type="number" id="pageInput" min="1" value="1">
+      <span id="pageTotal">/ -</span>
+    </div>
+    <button class="btn" id="nextPage" aria-label="Next page">
+      <svg viewBox="0 0 24 24"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg>
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="searchBtn" aria-label="Search" title="বইয়ে খুঁজুন">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.5 19l-5-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+    </button>
+    <button class="btn" id="thumbBtn" aria-label="Thumbnails" title="পৃষ্ঠা তালিকা">
+      <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z"/></svg>
+    </button>
+    <button class="btn" id="bookmarkBtn" aria-label="Bookmarks" title="বুকমার্ক">
+      <svg viewBox="0 0 24 24"><path d="M6 2h12a1 1 0 0 1 1 1v18l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>
+    </button>
+    <button class="btn" id="themeBtn" aria-label="Toggle theme" title="থিম পরিবর্তন">
+      <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 0 1-7.54-7.54A9 9 0 0 0 12 3z"/></svg>
+    </button>
+    <button class="btn" id="fullscreenBtn" aria-label="Fullscreen" title="ফুলস্ক্রিন">
+      <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+    </button>
+  </div>
+
+  <button class="btn-primary" id="downloadBtn">
+    <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12 2v12.17l3.59-3.58L17 12l-5 5-5-5 1.41-1.41L11 14.17V2h1z"/></svg>
+    <span>ডাউনলোড</span>
+  </button>
+</header>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<main id="viewer">
+  <div id="loading">
+    <div class="spinner"></div>
+    <div>বই লোড হচ্ছে, একটু অপেক্ষা করুন…</div>
+  </div>
+</main>
+
+<div class="fab-nav" id="fabNav" style="display:none;">
+  <button class="btn" id="fabPrev"><svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg></button>
+  <span style="font-size:12.5px;padding:0 6px;color:var(--muted);" id="fabPageLabel">1 / -</span>
+  <button class="btn" id="fabNext"><svg viewBox="0 0 24 24"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg></button>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h3 id="sidebarTitle">খুঁজুন</h3>
+    <button class="btn" id="closeSidebar"><svg viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.7l-1.42-1.41L9.17 12 2.88 5.71 4.3 4.29l6.29 6.3 6.29-6.3z"/></svg></button>
+  </div>
+  <div class="sidebar-tabs">
+    <div class="sidebar-tab active" data-tab="search">সার্চ</div>
+    <div class="sidebar-tab" data-tab="thumb">পৃষ্ঠা</div>
+    <div class="sidebar-tab" data-tab="bookmark">বুকমার্ক</div>
+  </div>
+  <div class="sidebar-body" id="sidebarBody">
+    <div id="tab-search">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="শব্দ লিখে Enter চাপুন…">
+        <button class="btn" id="searchGo"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.5 19l-5-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg></button>
+      </div>
+      <div style="padding:12px;">
+        <div class="search-meta" id="searchMeta"></div>
+        <div id="searchResults"></div>
+      </div>
+    </div>
+    <div id="tab-thumb" style="display:none;padding:6px;"></div>
+    <div id="tab-bookmark" style="display:none;padding:6px 12px;">
+      <button class="btn-primary" id="addBookmarkBtn" style="width:100%;justify-content:center;margin-bottom:12px;">+ এই পৃষ্ঠা বুকমার্ক করুন</button>
+      <div id="bookmarkList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- pdf.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const state = {
+  pdf:null,
+  totalPages:0,
+  currentPage:1,
+  scale:1.0,
+  baseWidth:0,
+  pageEls:{},         // pageNum -> wrapper div
+  renderedPages:new Set(),
+  observer:null,
+  storageKey: "reader_" + PDF_FILE,
+};
+
+document.getElementById("bookTitleEl").textContent = BOOK_TITLE;
+document.title = BOOK_TITLE + " | অনলাইন রিডার";
+
+const viewer = document.getElementById("viewer");
+const loadingEl = document.getElementById("loading");
+const pageInput = document.getElementById("pageInput");
+const pageTotal = document.getElementById("pageTotal");
+const pageSub = document.getElementById("pageSub");
+const progressFill = document.getElementById("progressFill");
+const fabNav = document.getElementById("fabNav");
+const fabPageLabel = document.getElementById("fabPageLabel");
+
+// ---------------- Load PDF ----------------
+// free/shared hosting (InfinityFree ইত্যাদি) প্রায়ই HTTP Range রিকোয়েস্ট ঠিকমতো
+// সাপোর্ট করে না, যার কারণে pdf.js এর ডিফল্ট streaming/range লোড ফেইল করে বা
+// আটকে থাকে। তাই পুরো ফাইল একবারে fetch করে ArrayBuffer হিসেবে pdf.js কে
+// দেওয়া হচ্ছে — এটা সব হোস্টিং এ সবচেয়ে নির্ভরযোগ্য পদ্ধতি।
+async function loadPdf(){
+  const res = await fetch(PDF_FILE + "?v=1", {cache: "no-store"});
+  if (!res.ok){
+    throw new Error("HTTP " + res.status + " — PDF ফাইল সার্ভারে পাওয়া যায়নি বা এক্সেস করা যাচ্ছে না।");
+  }
+  const buf = await res.arrayBuffer();
+  const loadingTask = pdfjsLib.getDocument({
+    data: buf,
+    disableRange: true,
+    disableStream: true,
+    disableAutoFetch: true
+  });
+  return loadingTask.promise;
+}
+
+loadPdf().then(async (pdf) => {
+  state.pdf = pdf;
+  state.totalPages = pdf.numPages;
+  pageInput.max = state.totalPages;
+  pageTotal.textContent = "/ " + state.totalPages;
+  loadingEl.style.display = "none";
+  fabNav.style.display = "flex";
+
+  await renderAllShells();
+  restoreProgress();
+  setupObserver();
+  buildThumbnails();
+  updatePageUI();
+}).catch(err => {
+  loadingEl.innerHTML = `<div style="color:var(--accent);text-align:center;padding:20px;max-width:420px;">
+    বইটি লোড করা যায়নি।<br>
+    <span style="font-size:12px;color:var(--muted);display:block;margin-top:8px;">
+      সম্ভাব্য কারণ:<br>
+      ১. <b>${PDF_FILE}</b> ফাইলটি index.html এর একই ফোল্ডারে নেই (নাম/এক্সটেনশন case-sensitive — Book.pdf আর book.pdf আলাদা)<br>
+      ২. index.html সরাসরি ডাবল-ক্লিক করে (file://) খোলা হয়েছে — এটা আসল ওয়েবসাইটে (http/https) আপলোড করে খুলতে হবে<br>
+      ৩. সার্ভার এরর: <code style="word-break:break-all;">${(err && err.message) ? err.message : err}</code>
+    </span>
+  </div>`;
+  console.error(err);
+});
+
+// Create placeholder shells for every page (so scroll height is correct), render lazily
+async function renderAllShells(){
+  const firstPage = await state.pdf.getPage(1);
+  const vp = firstPage.getViewport({scale:1});
+  state.baseWidth = vp.width;
+
+  for (let i=1;i<=state.totalPages;i++){
+    const wrap = document.createElement("div");
+    wrap.className = "page-wrap";
+    wrap.dataset.pageNum = i;
+    wrap.style.width = (vp.width*state.scale)+"px";
+    wrap.style.height = (vp.height*state.scale)+"px";
+    wrap.style.background = "#ffffff11";
+
+    const tag = document.createElement("div");
+    tag.className = "page-num-tag";
+    tag.textContent = i + " / " + state.totalPages;
+    wrap.appendChild(tag);
+
+    viewer.appendChild(wrap);
+    state.pageEls[i] = wrap;
+  }
+}
+
+async function renderPage(num){
+  if (state.renderedPages.has(num)) return;
+  state.renderedPages.add(num);
+  const wrap = state.pageEls[num];
+  const page = await state.pdf.getPage(num);
+  const viewport = page.getViewport({scale: state.scale * (window.devicePixelRatio || 1)});
+  const canvas = document.createElement("canvas");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  canvas.style.width = (viewport.width/(window.devicePixelRatio||1))+"px";
+  canvas.style.height = (viewport.height/(window.devicePixelRatio||1))+"px";
+  wrap.insertBefore(canvas, wrap.firstChild);
+  const ctx = canvas.getContext("2d");
+  await page.render({canvasContext:ctx, viewport}).promise;
+  wrap.style.background = "transparent";
+}
+
+function setupObserver(){
+  if (state.observer) state.observer.disconnect();
+  state.observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const num = parseInt(entry.target.dataset.pageNum);
+      if (entry.isIntersecting){
+        renderPage(num);
+        // preload neighbors
+        if (num>1) renderPage(num-1);
+        if (num<state.totalPages) renderPage(num+1);
+      }
+    });
+  }, {root:viewer, rootMargin:"400px 0px 400px 0px", threshold:0.01});
+  Object.values(state.pageEls).forEach(el=>state.observer.observe(el));
+}
+
+// ---------------- Scroll tracking ----------------
+let scrollTimeout;
+viewer.addEventListener("scroll", ()=>{
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(()=>{
+    const mid = viewer.scrollTop + viewer.clientHeight*0.35;
+    let closest = 1, closestDist = Infinity;
+    for (const [num, el] of Object.entries(state.pageEls)){
+      const dist = Math.abs(el.offsetTop - mid);
+      if (dist < closestDist){closestDist=dist; closest=parseInt(num);}
+    }
+    state.currentPage = closest;
+    updatePageUI();
+    saveProgress();
+  }, 100);
+});
+
+function updatePageUI(){
+  pageInput.value = state.currentPage;
+  pageSub.textContent = state.currentPage + " / " + state.totalPages + " পৃষ্ঠা";
+  fabPageLabel.textContent = state.currentPage + " / " + state.totalPages;
+  progressFill.style.width = (state.currentPage/state.totalPages*100)+"%";
+  document.getElementById("prevPage").disabled = state.currentPage<=1;
+  document.getElementById("nextPage").disabled = state.currentPage>=state.totalPages;
+  document.getElementById("fabPrev").disabled = state.currentPage<=1;
+  document.getElementById("fabNext").disabled = state.currentPage>=state.totalPages;
+  highlightThumb(state.currentPage);
+}
+
+function goToPage(num, smooth=true){
+  num = Math.min(Math.max(1,num), state.totalPages);
+  const el = state.pageEls[num];
+  if (el) el.scrollIntoView({behavior: smooth?"smooth":"auto", block:"start"});
+  state.currentPage = num;
+  updatePageUI();
+  saveProgress();
+}
+
+// ---------------- Controls ----------------
+document.getElementById("prevPage").onclick = ()=>goToPage(state.currentPage-1);
+document.getElementById("nextPage").onclick = ()=>goToPage(state.currentPage+1);
+document.getElementById("fabPrev").onclick = ()=>goToPage(state.currentPage-1);
+document.getElementById("fabNext").onclick = ()=>goToPage(state.currentPage+1);
+pageInput.addEventListener("change", ()=>goToPage(parseInt(pageInput.value)||1));
+
+document.addEventListener("keydown", (e)=>{
+  if (document.activeElement.tagName === "INPUT") return;
+  if (e.key === "ArrowRight" || e.key === "PageDown") goToPage(state.currentPage+1);
+  if (e.key === "ArrowLeft" || e.key === "PageUp") goToPage(state.currentPage-1);
+});
+
+// ---------------- Zoom ----------------
+const zoomLevelEl = document.getElementById("zoomLevel");
+function applyZoom(newScale){
+  state.scale = Math.min(Math.max(newScale, 0.5), 2.5);
+  zoomLevelEl.textContent = Math.round(state.scale*100)+"%";
+  const curPage = state.currentPage;
+  state.renderedPages.clear();
+  for (const [num, el] of Object.entries(state.pageEls)){
+    el.innerHTML = "";
+    const tag = document.createElement("div");
+    tag.className = "page-num-tag";
+    tag.textContent = num + " / " + state.totalPages;
+    el.appendChild(tag);
+    el.style.width = (state.baseWidth*state.scale)+"px";
+    el.style.height = "auto";
+  }
+  requestAnimationFrame(()=>{
+    goToPage(curPage, false);
+    setTimeout(()=>{
+      Object.entries(state.pageEls).forEach(([num,el])=>{
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight+400 && rect.bottom > -400) renderPage(parseInt(num));
+      });
+    }, 50);
+  });
+}
+document.getElementById("zoomIn").onclick = ()=>applyZoom(state.scale+0.15);
+document.getElementById("zoomOut").onclick = ()=>applyZoom(state.scale-0.15);
+
+// ---------------- Theme ----------------
+const themeBtn = document.getElementById("themeBtn");
+function setTheme(t){
+  document.body.setAttribute("data-theme", t);
+  localStorage.setItem("reader_theme", t);
+}
+themeBtn.onclick = ()=>{
+  const cur = document.body.getAttribute("data-theme");
+  setTheme(cur === "dark" ? "light" : "dark");
+};
+setTheme(localStorage.getItem("reader_theme") || "dark");
+
+// ---------------- Fullscreen ----------------
+document.getElementById("fullscreenBtn").onclick = ()=>{
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+};
+
+// ---------------- Download ----------------
+document.getElementById("downloadBtn").onclick = ()=>{
+  const a = document.createElement("a");
+  a.href = PDF_FILE;
+  a.download = BOOK_TITLE + ".pdf";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
+
+// ---------------- Progress save/restore ----------------
+function saveProgress(){
+  localStorage.setItem(state.storageKey, JSON.stringify({page: state.currentPage, ts: Date.now()}));
+}
+function restoreProgress(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(state.storageKey));
+    if (saved && saved.page > 1){
+      setTimeout(()=>goToPage(saved.page, false), 150);
+    }
+  }catch(e){}
+}
+
+// ---------------- Sidebar ----------------
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const sidebarTitle = document.getElementById("sidebarTitle");
+function openSidebar(tab){
+  sidebar.classList.add("open");
+  overlay.classList.add("show");
+  switchTab(tab);
+}
+function closeSidebar(){
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+}
+document.getElementById("closeSidebar").onclick = closeSidebar;
+overlay.onclick = closeSidebar;
+document.getElementById("searchBtn").onclick = ()=>openSidebar("search");
+document.getElementById("thumbBtn").onclick = ()=>openSidebar("thumb");
+document.getElementById("bookmarkBtn").onclick = ()=>openSidebar("bookmark");
+
+const tabTitles = {search:"বইয়ে খুঁজুন", thumb:"পৃষ্ঠাসমূহ", bookmark:"বুকমার্কসমূহ"};
+document.querySelectorAll(".sidebar-tab").forEach(t=>{
+  t.onclick = ()=>switchTab(t.dataset.tab);
+});
+function switchTab(tab){
+  document.querySelectorAll(".sidebar-tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===tab));
+  document.getElementById("tab-search").style.display = tab==="search" ? "block":"none";
+  document.getElementById("tab-thumb").style.display = tab==="thumb" ? "block":"none";
+  document.getElementById("tab-bookmark").style.display = tab==="bookmark" ? "block":"none";
+  sidebarTitle.textContent = tabTitles[tab];
+  if (tab === "bookmark") renderBookmarks();
+}
+
+// ---------------- Search ----------------
+const searchInput = document.getElementById("searchInput");
+const searchResults = document.getElementById("searchResults");
+const searchMeta = document.getElementById("searchMeta");
+document.getElementById("searchGo").onclick = doSearch;
+searchInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doSearch(); });
+
+async function doSearch(){
+  const q = searchInput.value.trim();
+  if (!q){ searchResults.innerHTML=""; searchMeta.textContent=""; return; }
+  searchMeta.textContent = "খোঁজা হচ্ছে…";
+  searchResults.innerHTML = "";
+  let matches = [];
+  for (let i=1;i<=state.totalPages;i++){
+    const page = await state.pdf.getPage(i);
+    const content = await page.getTextContent();
+    const text = content.items.map(it=>it.str).join(" ");
+    const idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if (idx !== -1){
+      const start = Math.max(0, idx-40);
+      const snippet = (start>0?"…":"") + text.substring(start, idx) +
+        "<b>" + text.substring(idx, idx+q.length) + "</b>" +
+        text.substring(idx+q.length, idx+q.length+60) + "…";
+      matches.push({page:i, snippet});
+    }
+    if (matches.length >= 40) break;
+  }
+  searchMeta.textContent = matches.length ? `${matches.length}টি ফলাফল পাওয়া গেছে` : "কোনো ফলাফল পাওয়া যায়নি";
+  searchResults.innerHTML = matches.map(m=>
+    `<div class="search-result-item" data-page="${m.page}">
+       <div style="color:var(--accent);font-weight:700;font-size:11.5px;margin-bottom:4px;">পৃষ্ঠা ${m.page}</div>
+       <div>${m.snippet}</div>
+     </div>`
+  ).join("");
+  searchResults.querySelectorAll(".search-result-item").forEach(el=>{
+    el.onclick = ()=>{ goToPage(parseInt(el.dataset.page)); closeSidebar(); };
+  });
+}
+
+// ---------------- Thumbnails ----------------
+async function buildThumbnails(){
+  const container = document.getElementById("tab-thumb");
+  container.innerHTML = "";
+  for (let i=1;i<=state.totalPages;i++){
+    const item = document.createElement("div");
+    item.className = "thumb-item";
+    item.dataset.page = i;
+    const canvas = document.createElement("canvas");
+    const span = document.createElement("span");
+    span.textContent = i;
+    item.appendChild(canvas);
+    item.appendChild(span);
+    item.onclick = ()=>{ goToPage(i); closeSidebar(); };
+    container.appendChild(item);
+    renderThumb(i, canvas);
+  }
+}
+async function renderThumb(num, canvas){
+  const page = await state.pdf.getPage(num);
+  const vp = page.getViewport({scale:0.22});
+  canvas.width = vp.width; canvas.height = vp.height;
+  await page.render({canvasContext:canvas.getContext("2d"), viewport:vp}).promise;
+}
+function highlightThumb(num){
+  document.querySelectorAll(".thumb-item").forEach(el=>{
+    el.classList.toggle("active", parseInt(el.dataset.page)===num);
+  });
+}
+
+// ---------------- Bookmarks ----------------
+const bmKey = "bookmarks_" + PDF_FILE;
+function getBookmarks(){
+  try{ return JSON.parse(localStorage.getItem(bmKey)) || []; }catch(e){ return []; }
+}
+function setBookmarks(list){ localStorage.setItem(bmKey, JSON.stringify(list)); }
+document.getElementById("addBookmarkBtn").onclick = ()=>{
+  const list = getBookmarks();
+  if (!list.includes(state.currentPage)){
+    list.push(state.currentPage);
+    list.sort((a,b)=>a-b);
+    setBookmarks(list);
+    renderBookmarks();
+  }
+};
+function renderBookmarks(){
+  const list = getBookmarks();
+  const box = document.getElementById("bookmarkList");
+  if (!list.length){
+    box.innerHTML = `<div class="bookmark-empty">এখনো কোনো বুকমার্ক নেই</div>`;
+    return;
+  }
+  box.innerHTML = list.map(p=>
+    `<div class="bookmark-item" data-page="${p}">
+       <span>📖 পৃষ্ঠা ${p}</span>
+       <span class="del" data-del="${p}">✕</span>
+     </div>`
+  ).join("");
+  box.querySelectorAll(".bookmark-item").forEach(el=>{
+    el.addEventListener("click", (e)=>{
+      if (e.target.dataset.del) return;
+      goToPage(parseInt(el.dataset.page));
+      closeSidebar();
+    });
+  });
+  box.querySelectorAll("[data-del]").forEach(el=>{
+    el.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      const p = parseInt(el.dataset.del);
+      setBookmarks(getBookmarks().filter(x=>x!==p));
+      renderBookmarks();
+    });
+  });
+}
+</script>
+</body>
+</html>
